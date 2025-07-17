@@ -30,6 +30,18 @@ namespace RealtimeNotifications.Controllers
             }else
                 return NotFound();
         }
+        [HttpPut]
+        public IActionResult Put(Login login)
+        {
+            var loginObj = new User
+            {
+                UserName = login.UserName,
+                Password = login.Password
+            };
+            _context.Users.Add(loginObj);
+            _context.SaveChanges();
+            return Ok("Login API is working");
+        }
         private string getValidToken(string userName)
         {
             var claim = new List<Claim> { 

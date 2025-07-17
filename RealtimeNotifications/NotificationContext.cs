@@ -19,8 +19,8 @@ public partial class NotificationContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Name=ConnectionStrings:defaultconnectionstring");
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //    => optionsBuilder.UseSqlServer("Name=ConnectionStrings:defaultconnectionstring");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

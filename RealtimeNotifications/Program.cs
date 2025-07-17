@@ -8,13 +8,15 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using RealtimeNotifications;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddDbContext<NotificationContext>();
+//builder.Services.AddDbContext<NotificationContext>();
+builder.Services.AddDbContext<NotificationContext>(option => option.UseSqlite("Data Source=app.db"));
 builder.Services.AddSignalR();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
@@ -66,7 +68,7 @@ builder.Services.AddCors(options =>
     
         options.AddPolicy("AllowAngularDev", policy =>
         {
-            policy.WithOrigins("http://localhost:4200")
+            policy.WithOrigins("http://localhost:4200","https://my-signalr-client.onrender.com")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();
@@ -76,8 +78,18 @@ builder.Services.AddCors(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(Int32.Parse(port));
+});
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<NotificationContext>();
+    dbContext.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 
