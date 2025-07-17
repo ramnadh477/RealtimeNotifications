@@ -1,0 +1,6 @@
+@RealtimesignaR_HostAddress = http://localhost:5047
+
+GET {{RealtimesignaR_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
