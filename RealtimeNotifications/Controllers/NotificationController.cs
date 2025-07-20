@@ -18,9 +18,9 @@ namespace RealtimeNotifications.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] SendNotificationCommand command)
+        public async Task<IActionResult> Post([FromBody] OrderUpdateNotification command)
         {
-            await _mediator.Send(command);
+            await _mediator.Publish(command);
             return Ok("Notification sent");
         }
         [HttpGet]

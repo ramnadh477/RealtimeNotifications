@@ -9,6 +9,9 @@ using System.Text;
 using RealtimeNotifications;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using RealtimeNotifications.Middleware;
+using Serilog;
+using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,10 +22,11 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<NotificationContext>(option => option.UseSqlite("Data Source=app.db"));
 builder.Services.AddSignalR();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<INotificationService, NotificationService>();
-//builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -78,11 +82,18 @@ builder.Services.AddCors(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(Int32.Parse(port));
-});
+//var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+//builder.WebHost.ConfigureKestrel(options =>
+//{
+//    options.ListenAnyIP(Int32.Parse(port));
+//});
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+builder.Host.UseSerilog();
+
+
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
@@ -98,8 +109,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseSerilogRequestLogging();
 app.UseCors("AllowAngularDev");
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
 app.UseWebSockets();

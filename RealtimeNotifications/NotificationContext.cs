@@ -15,15 +15,31 @@ public partial class NotificationContext : DbContext
     {
     }
 
+    public virtual DbSet<Group> Groups { get; set; }
+
     public virtual DbSet<Notification> Notifications { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<UserGroup> UserGroups { get; set; }
 
     //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     //    => optionsBuilder.UseSqlServer("Name=ConnectionStrings:defaultconnectionstring");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Group>(entity =>
+        {
+            entity.HasKey(e => e.GrupeId);
+
+            entity.ToTable("Group");
+
+            entity.Property(e => e.GrupeId).HasColumnName("GrupeID");
+            entity.Property(e => e.GroupName)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<Notification>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Notifica__3214EC272E67536F");
@@ -51,6 +67,21 @@ public partial class NotificationContext : DbContext
             entity.Property(e => e.UserName)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<UserGroup>(entity =>
+        {
+            entity.ToTable("UserGroup");
+
+            entity.HasOne(d => d.UserGroupNavigation).WithMany(p => p.UserGroups)
+                .HasForeignKey(d => d.UserGroupId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UserGroup_Group");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserGroups)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UserGroup_User");
         });
 
         OnModelCreatingPartial(modelBuilder);

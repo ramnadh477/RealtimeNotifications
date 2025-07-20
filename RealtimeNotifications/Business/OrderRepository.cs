@@ -14,7 +14,7 @@ namespace RealtimeNotifications.Business
             new Order { Id = 5, customerName = "Ethan Hunt", Product = "Mouse", Quantity = 2, Price = 40.00m, Date = DateTime.Now.AddDays(-5) ,Status="Pending" },
         };
 public Task<Order> GetByIdAsync(int orderId)=>
-            Task.FromResult(_orders.FirstOrDefault(o => o.Id == orderId));
+            Task.FromResult(_orders.First(o => o.Id == orderId));
         public Task<List<Order>> GetOrderAsync() =>
             Task.FromResult(_orders);
 
