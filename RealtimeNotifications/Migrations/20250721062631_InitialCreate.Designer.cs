@@ -11,7 +11,7 @@ using RealtimeNotifications;
 namespace RealtimeNotifications.Migrations
 {
     [DbContext(typeof(NotificationContext))]
-    [Migration("20250717141257_InitialCreate")]
+    [Migration("20250721062631_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -19,6 +19,23 @@ namespace RealtimeNotifications.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
+
+            modelBuilder.Entity("RealtimeNotifications.Group", b =>
+                {
+                    b.Property<int>("GrupeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("GrupeID");
+
+                    b.Property<string>("GroupName")
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("GrupeId");
+
+                    b.ToTable("Group", (string)null);
+                });
 
             modelBuilder.Entity("RealtimeNotifications.Notification", b =>
                 {
@@ -69,6 +86,56 @@ namespace RealtimeNotifications.Migrations
                         .HasName("PK__User__1788CCAC7B4C4081");
 
                     b.ToTable("User", (string)null);
+                });
+
+            modelBuilder.Entity("RealtimeNotifications.UserGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserGroupId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserGroupId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserGroup", (string)null);
+                });
+
+            modelBuilder.Entity("RealtimeNotifications.UserGroup", b =>
+                {
+                    b.HasOne("RealtimeNotifications.Group", "UserGroupNavigation")
+                        .WithMany("UserGroups")
+                        .HasForeignKey("UserGroupId")
+                        .IsRequired()
+                        .HasConstraintName("FK_UserGroup_Group");
+
+                    b.HasOne("RealtimeNotifications.User", "User")
+                        .WithMany("UserGroups")
+                        .HasForeignKey("UserId")
+                        .IsRequired()
+                        .HasConstraintName("FK_UserGroup_User");
+
+                    b.Navigation("User");
+
+                    b.Navigation("UserGroupNavigation");
+                });
+
+            modelBuilder.Entity("RealtimeNotifications.Group", b =>
+                {
+                    b.Navigation("UserGroups");
+                });
+
+            modelBuilder.Entity("RealtimeNotifications.User", b =>
+                {
+                    b.Navigation("UserGroups");
                 });
 #pragma warning restore 612, 618
         }

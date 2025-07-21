@@ -9,5 +9,5 @@ public partial class Group
 
     public string? GroupName { get; set; }
 
-    public virtual ICollection<UserGroup> UserGroups { get; set; } = [];
+    public virtual ICollection<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
 }
