@@ -24,13 +24,18 @@ namespace RealtimeNotifications.Controllers
         [HttpPost(Name = "Login")]
         public IActionResult Post(Login login)
         {
-            var user = _context.Users.Where(n => n.UserName == login.UserName).FirstOrDefault();
-            if (user is not null)
+            if (ModelState.IsValid)
             {
-                _logger.LogInformation($"User {user.UserName} logged in successfully.");
-                var token = getValidToken(user.UserName,user.UserId);
-                return Ok(new { Token = token ,User=user});
-            }else
+                var user = _context.Users.Where(n => n.UserName == login.UserName).FirstOrDefault();
+                if (user is not null)
+                {
+                    _logger.LogInformation($"User {user.UserName} logged in successfully.");
+                    var token = getValidToken(user.UserName, user.UserId);
+                    return Ok(new { Token = token, User = user });
+                }else
+                    return NotFound();
+            }
+            else
                 return NotFound();
         }
         [HttpPut]
@@ -51,7 +56,8 @@ namespace RealtimeNotifications.Controllers
                 new Claim(ClaimTypes.Name, userID.ToString()),
              new Claim(ClaimTypes.NameIdentifier, userID.ToString())};
             var keystring=!string.IsNullOrEmpty(Configuration["Jwt:Key"])? Configuration["Jwt:Key"]:string.Empty;
-            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(s:keystring));
+            string str = keystring ?? "";
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(s: str));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(issuer: "My-api", audience: "My-Client", claims: claim, expires: DateTime.Now.AddMinutes(30), signingCredentials: creds);
             return new JwtSecurityTokenHandler().WriteToken(token);

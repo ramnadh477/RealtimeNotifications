@@ -31,7 +31,7 @@ namespace RealtimeNotifications.Business
             }
         }
 
-        public Task<List<GroupsDto>> GetAllGroups(int userId)
+        public async Task<List<GroupsDto>> GetAllGroups(int userId)
         {
             List<GroupsDto> result = new List<GroupsDto>();
             try
@@ -47,15 +47,13 @@ namespace RealtimeNotifications.Business
                                 GroupId = groups.GrupeId,
                                 isJoined = string.IsNullOrEmpty(g.UserId.ToString()) ? false : true,
                             };
-                result = query.ToList();
-                return Task.FromResult(result);
+                result = await Task.FromResult(query.ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError($"By calling GetAllGroups getting error : {ex.Message} on {DateTime.Now.ToShortTimeString}");
             }
-            return Task.FromResult(result);
-
+            return result;
         }
 
         public Task UpdateUserGroup(UserGroupDto group)
