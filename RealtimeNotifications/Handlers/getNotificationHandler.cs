@@ -12,9 +12,9 @@ namespace RealtimeNotifications.Handlers
     public record getNotificationQuery(int id):IRequest<List<NotificationObj>>;
     public class GetNotificationHandler(INotificationRepository _context) : IRequestHandler<getNotificationQuery,List<NotificationObj>>
     {
-        public Task<List<NotificationObj>> Handle(getNotificationQuery request, CancellationToken cancellationToken)
+        public async Task<List<NotificationObj>> Handle(getNotificationQuery request, CancellationToken cancellationToken)
         {
-            var result =_context.GetNotificationById(request.id);
+            var result = await _context.GetNotificationById(request.id);
             return result;
         }
     }
@@ -23,9 +23,9 @@ namespace RealtimeNotifications.Handlers
     public record getreadNotificationQuery(int id,bool read) : IRequest<List<getreaNotificationObj>>;
     public class GetreadNotificationHandler(INotificationRepository _context) : IRequestHandler<getreadNotificationQuery, List<getreaNotificationObj>>
     {
-        public  Task<List<getreaNotificationObj>> Handle(getreadNotificationQuery request, CancellationToken cancellationToken)
+        public async  Task<List<getreaNotificationObj>> Handle(getreadNotificationQuery request, CancellationToken cancellationToken)
         {
-            var result = _context.GetNotificationByIdandReadStatus(request.id, request.read);
+            var result = await _context.GetNotificationByIdandReadStatus(request.id, request.read);
             return result;
         }
     }

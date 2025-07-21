@@ -15,14 +15,14 @@ namespace RealtimeNotifications.Handlers.Group
             {
                 if (request.id.isJoined)
                 {
-                   await hubContext.Clients.Group(groupname).SendAsync("ReceiveNotification", $"{request.id.UserName} has Left the group {groupname}.");
-                   await hubContext.Groups.RemoveFromGroupAsync(request.id.Connectionid.ToString(), groupname);
+                   await hubContext.Clients.Group(groupname).SendAsync("ReceiveNotification", $"{request.id.UserName} has Left the group {groupname}.", cancellationToken: cancellationToken);
+                   await hubContext.Groups.RemoveFromGroupAsync(request.id.Connectionid.ToString(), groupname, cancellationToken);
                     _logger.LogInformation($"User {request.id.UserName} left the Group {request.id.GroupName}");
                 }
                 else
                 {
-                   await hubContext.Groups.AddToGroupAsync(request.id.Connectionid.ToString(), groupname);
-                   await hubContext.Clients.Group(groupname).SendAsync("ReceiveNotification", $"{request.id.UserName} has joined the group {groupname}.");
+                   await hubContext.Groups.AddToGroupAsync(request.id.Connectionid.ToString(), groupname, cancellationToken);
+                   await hubContext.Clients.Group(groupname).SendAsync("ReceiveNotification", $"{request.id.UserName} has joined the group {groupname}.", cancellationToken: cancellationToken);
                     _logger.LogInformation($"User {request.id.UserName} Joined the Group {request.id.GroupName}");
                 }
             }

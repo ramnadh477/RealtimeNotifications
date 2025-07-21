@@ -10,17 +10,12 @@ namespace RealtimeNotifications.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LoginController : ControllerBase
+    public class LoginController(IConfiguration configuration, NotificationContext context, ILogger<LoginController> logger) : ControllerBase
     {
-        private readonly IConfiguration Configuration;
-        private readonly NotificationContext _context;
-        private readonly ILogger<LoginController> _logger;
-        public LoginController(IConfiguration configuration,NotificationContext context,ILogger<LoginController> logger)
-        {
-            Configuration = configuration;
-            _context = context;
-            _logger = logger;
-        }
+        private readonly IConfiguration Configuration = configuration;
+        private readonly NotificationContext _context = context;
+        private readonly ILogger<LoginController> _logger = logger;
+
         [HttpPost(Name = "Login")]
         public IActionResult Post(Login login)
         {
@@ -53,11 +48,11 @@ namespace RealtimeNotifications.Controllers
         private string getValidToken(string? userName,int userID)
         {
             var claim = new List<Claim> { 
-                new Claim(ClaimTypes.Name, userID.ToString()),
-             new Claim(ClaimTypes.NameIdentifier, userID.ToString())};
+                new(ClaimTypes.Name, userID.ToString()),
+             new(ClaimTypes.NameIdentifier, userID.ToString())};
             var keystring=!string.IsNullOrEmpty(Configuration["Jwt:Key"])? Configuration["Jwt:Key"]:string.Empty;
             string str = keystring ?? "";
-            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(s: str));
+            SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(s: str));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(issuer: "My-api", audience: "My-Client", claims: claim, expires: DateTime.Now.AddMinutes(30), signingCredentials: creds);
             return new JwtSecurityTokenHandler().WriteToken(token);

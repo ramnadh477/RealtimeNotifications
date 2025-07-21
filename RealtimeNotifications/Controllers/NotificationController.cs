@@ -8,14 +8,9 @@ namespace RealtimeNotifications.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class NotificationController : ControllerBase
+    public class NotificationController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-
-        public NotificationController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        private readonly IMediator _mediator = mediator;
 
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] OrderUpdateNotification command)
@@ -42,8 +37,7 @@ namespace RealtimeNotifications.Controllers
         public async Task<IActionResult> Put(UpdateNotificationObj id) {
             var query = new updateNotificationQuery(id);
             var not = await _mediator.Send(query);
-            
-            return Ok();
+            return Ok(not);
         }
     }
 }

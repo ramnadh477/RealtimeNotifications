@@ -8,15 +8,11 @@ using System.Threading;
 
 namespace RealtimeNotifications.Business
 {
-    public class NotificationRepository : INotificationRepository
+    public class NotificationRepository(NotificationContext context, ILogger<NotificationRepository> logger) : INotificationRepository
     {
-        private readonly NotificationContext _context;
-        private readonly ILogger<NotificationRepository> _logger;
-        public NotificationRepository(NotificationContext context, ILogger<NotificationRepository> logger)
-        {
-            _context = context;
-            _logger = logger;
-        }
+        private readonly NotificationContext _context = context;
+        private readonly ILogger<NotificationRepository> _logger = logger;
+
         public Task CreateAsync(Notification notification)
         {
             try
@@ -41,7 +37,8 @@ namespace RealtimeNotifications.Business
             }
             catch (Exception ex)
             {
-                _logger.LogError($"By calling GetNotificationById getting error : {ex.Message} on {DateTime.Now.ToShortTimeString}");
+                string message = $"By calling GetNotificationById getting error : {ex.Message} on {DateTime.Now.ToShortTimeString}";
+                _logger.LogError(message);
                 throw;
             }
         }

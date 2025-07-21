@@ -6,15 +6,10 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace RealtimeNotifications.Business
 {
-    public class GroupRepository : IGroupRepository
+    public class GroupRepository(NotificationContext notificationContext, ILogger<GroupRepository> logger) : IGroupRepository
     {
-        private readonly NotificationContext _context;
-        private readonly ILogger<GroupRepository> _logger;
-        public GroupRepository(NotificationContext notificationContext, ILogger<GroupRepository> logger)
-        {
-            _context = notificationContext;
-            _logger = logger;
-        }
+        private readonly NotificationContext _context = notificationContext;
+        private readonly ILogger<GroupRepository> _logger = logger;
 
         public Task CreatGroup(Group group)
         {
@@ -33,7 +28,7 @@ namespace RealtimeNotifications.Business
 
         public async Task<List<GroupsDto>> GetAllGroups(int userId)
         {
-            List<GroupsDto> result = new List<GroupsDto>();
+            List<GroupsDto> result = [];
             try
             {
                 var query = from groups in _context.Groups
@@ -45,7 +40,7 @@ namespace RealtimeNotifications.Business
                                 Id = string.IsNullOrEmpty(g.Id.ToString()) ? 0 : g.Id,
                                 GroupName = groups.GroupName,
                                 GroupId = groups.GrupeId,
-                                isJoined = string.IsNullOrEmpty(g.UserId.ToString()) ? false : true,
+                                isJoined = !string.IsNullOrEmpty(g.UserId.ToString()),
                             };
                 result = await Task.FromResult(query.ToList());
             }

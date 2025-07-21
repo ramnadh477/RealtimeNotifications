@@ -7,14 +7,10 @@ namespace RealtimeNotifications.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class GroupController : ControllerBase
+    public class GroupController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-        public GroupController(IMediator mediator)
-        {
-            _mediator = mediator;
+        private readonly IMediator _mediator = mediator;
 
-        }
         [HttpGet("{userId}")]
         public async Task<IActionResult> Get(int userId)
         {
