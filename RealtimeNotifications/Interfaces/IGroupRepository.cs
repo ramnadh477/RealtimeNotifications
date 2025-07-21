@@ -6,5 +6,6 @@ namespace RealtimeNotifications.Interfaces
     {
         Task<List<GroupsDto>> GetAllGroups(int userId);
         Task UpdateUserGroup(UserGroupDto group);
+        Task CreatGroup(Group group);
     }
 }

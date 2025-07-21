@@ -3,6 +3,7 @@ using RealtimeNotifications.Interfaces;
 using RealtimeNotifications.Models;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
+
 namespace RealtimeNotifications.Business
 {
     public class GroupRepository : IGroupRepository
@@ -14,9 +15,25 @@ namespace RealtimeNotifications.Business
             _context = notificationContext;
             _logger = logger;
         }
+
+        public Task CreatGroup(Group group)
+        {
+            try
+            {
+                _context.Groups.Add(group);
+                _context.SaveChanges();
+                return Task.CompletedTask;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"By calling CreatGroup getting error : {ex.Message} on {DateTime.Now.ToShortTimeString}");
+                throw;
+            }
+        }
+
         public Task<List<GroupsDto>> GetAllGroups(int userId)
         {
-            List<GroupsDto> result=new List<GroupsDto>();
+            List<GroupsDto> result = new List<GroupsDto>();
             try
             {
                 var query = from groups in _context.Groups

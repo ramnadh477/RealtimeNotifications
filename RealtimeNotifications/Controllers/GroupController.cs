@@ -21,5 +21,12 @@ namespace RealtimeNotifications.Controllers
             var command = new GroupCommand(userId);
             return Ok(await _mediator.Send(command));
         }
+         [HttpPost]
+        public async Task<IActionResult> Post(string groupName)
+        {
+            var command = new GroupCMD(groupName);
+            await _mediator.Send(command);
+            return Ok("Group Created");
+        } 
     }
 }
