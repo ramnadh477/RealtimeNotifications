@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using RealtimeNotifications.Middleware;
 using Serilog;
 using MediatR;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -113,6 +114,21 @@ app.UseSerilogRequestLogging();
 app.UseCors("AllowAngularDev");
 
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseExceptionHandler(appBuilder =>
+{
+    appBuilder.Run(async context =>
+    {
+        var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+        var exception = exceptionHandlerFeature?.Error;
+        
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogError($"Global Error: {exception?.Message}");
+
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsync("An unhandled error occurred.");
+    });
+});
+
 
 app.MapControllers();
 app.UseWebSockets();

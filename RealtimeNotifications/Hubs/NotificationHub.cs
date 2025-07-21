@@ -20,31 +20,56 @@ namespace RealtimeNotifications.Hubs
 
         public async Task SendNotification(string userId, string message)
         {
-            string? isersd = Context.UserIdentifier;
-            if (!string.IsNullOrEmpty(isersd))
+            try
             {
-                await Clients.User(isersd).SendAsync("ReceiveNotification", message);
+                string? isersd = Context.UserIdentifier;
+                if (!string.IsNullOrEmpty(isersd))
+                {
+                    await Clients.User(isersd).SendAsync("ReceiveNotification", message);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"By Invoking SendNotification getting error : {ex.Message} on {DateTime.Now.ToShortTimeString}");
+                throw;
             }
         }
         public async Task UpdateNotification(int Id, int userID, string message, bool IsRead, DateTime date)
         {
-           await notrepo.UpdateStatus(Id, IsRead);
+            await notrepo.UpdateStatus(Id, IsRead);
         }
         public async Task JoinGroup(UserGroupDto userGroup)
         {
-            userGroup.Connectionid = Context.ConnectionId;
-            var cmd = new GroupJoin(userGroup);
-            await mediator.Publish(cmd);
-            logger.LogInformation($"User {userGroup.UserName} joined Group {userGroup.GroupName}");
+            try
+            {
+                userGroup.Connectionid = Context.ConnectionId;
+                var cmd = new GroupJoin(userGroup);
+                await mediator.Publish(cmd);
+                logger.LogInformation($"User {userGroup.UserName} joined Group {userGroup.GroupName}");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"By Invoking JoinGroup getting error : {ex.Message} on {DateTime.Now.ToShortTimeString}");
+            }
         }
 
         public async Task JoinGroups(List<string> GroupNames)
         {
-            logger.LogInformation($"User joined Groups");
-            foreach (var group in GroupNames)
+            try
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, group);
+                logger.LogInformation($"User joined Groups");
+                foreach (var group in GroupNames)
+                {
+                    await Groups.AddToGroupAsync(Context.ConnectionId, group);
+                }
+
             }
+            catch (Exception ex)
+            {
+                logger.LogError($"By Invoking JoinGroups getting error : {ex.Message} on {DateTime.Now.ToShortTimeString}");
+
+            }
+            
         }
         public async Task AddNotification(int Id, int userID, string message, bool IsRead, DateTime date)
         {
@@ -57,6 +82,6 @@ namespace RealtimeNotifications.Hubs
             };
             await notrepo.CreateAsync(notification);
         }
-        
+
     }
 }
